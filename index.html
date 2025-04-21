@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>VA5.5_HW2</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container py-3">
+      <h1>Book Database</h1>
+      <h2>GET Request</h2>
+      <button id="getDataThroughServerBtn" class="btn btn-primary">
+        Get Data
+      </button>
+      <br />
+
+      <div id="createCard"></div>
+
+      <br />
+
+      <form id="postRequestForm">
+        <h2>POST Request</h2>
+        <label for="book">Book Name:</label>
+        <br />
+        <input type="text" id="book" class="form-control" required />
+        <br />
+
+        <label for="author">Author:</label>
+        <br />
+        <input type="text" id="author" class="form-control" required />
+        <br />
+
+        <button class="btn btn-success">Submit</button>
+      </form>
+
+      <div id="dataContainer"></div>
+    </div>
+
+    <script>
+      const postRequestForm = document.querySelector("#postRequestForm");
+      const book = document.getElementById("book");
+      const author = document.getElementById("author");
+      const dataContainer = document.querySelector("#dataContainer");
+
+      const getDataThroughServerBtn = document.querySelector(
+        "#getDataThroughServerBtn"
+      );
+
+      const createCard = document.querySelector("#createCard");
+
+      const apiUrl = "https://post-books-student-neog.replit.app/books";
+
+      getDataThroughServerBtn.addEventListener("click", function () {
+        dataContainer.textContent = "";
+        fetch(apiUrl)
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            // console.log(data);
+            if (data) {
+              for (let i = 0; i < data.length; i++) {
+                const div = document.createElement("div");
+                div.className = "container card py-3 mt-2";
+
+                const postId = document.createElement("h3");
+                postId.innerHTML = `POST ID: ${data[i]._id}`;
+
+                const user = document.createElement("p");
+                user.textContent = JSON.stringify(data[i]);
+
+                div.appendChild(postId);
+                div.appendChild(user);
+
+                createCard.appendChild(div);
+                // console.log(createCard);
+
+                // dataContainer.textContent = createCard;
+              }
+            }
+          });
+      });
+
+      postRequestForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const bookData = {
+          bookName: book.value,
+          author: author.value,
+        };
+        // console.log(bookData);
+        fetch(apiUrl, {
+          method: "POST",
+          body: JSON.stringify(bookData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            if (data) {
+              // console.log(data);
+
+              dataContainer.textContent = JSON.stringify(data);
+            } else {
+              dataContainer.textContent = "Failed to make a POST call.";
+            }
+          })
+          .catch(function (error) {
+            dataContainer.textContent =
+              "An error occured while making the POST call.";
+          });
+      });
+    </script>
+  </body>
+</html>
